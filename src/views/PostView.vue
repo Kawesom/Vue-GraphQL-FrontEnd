@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <div>
+  <div >
     <h2>Apollo Query Component</h2>
       <ApolloQuery :query="gql => gql`
        query Post($id: ID!) {
