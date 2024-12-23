@@ -13,7 +13,10 @@
       </div>
     </div>
   </div>
-
+  <RouterLink :to="{ name: 'update', params: {id: $route.params.id}}">
+    Update
+  </RouterLink>
+  <button @click="deletePost">Delete Post</button>
   <div >
     <h2>Apollo Query Component</h2>
       <ApolloQuery :query="gql => gql`
@@ -57,10 +60,12 @@
 </style>
 
 <script setup>
-import { useQuery } from '@vue/apollo-composable';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { ApolloQuery } from '@vue/apollo-components';
+import { ref } from 'vue';
+
 
 const { result, loading } = useQuery(gql`
      query Post($id: ID!) {
@@ -74,6 +79,45 @@ const { result, loading } = useQuery(gql`
           id: useRoute().params.id,
           }
         )
+
+loading.value = ref(false)
+
+const router = useRouter()
+const route = useRoute()
+
+const DELETE_POST_MUTATION = gql`
+  mutation deletePost(
+    $id: ID!
+  ) {
+    deletePost(id: $id) {
+      id
+    }
+  }
+`
+
+const { mutate, onDone, onError } = useMutation(DELETE_POST_MUTATION)
+
+const deletePost = () => {
+  loading.value = true
+  mutate({
+    id: route.params.id,
+  })
+
+  onDone((data) => {
+    console.log(data)
+    loading.value = false
+    router.push({ name: 'home' })
+  })
+
+  onError((error) => {
+    //logErrorMessages(error)
+    console.log(error.graphQLErrors)
+    loading.value = false
+
+    //Object.keys(error.graphQLErrors[0].message)[0]
+    //errors.value. = error.graphQLErrors[0].message
+  })
+}
 
 </script>
 

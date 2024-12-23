@@ -82,9 +82,7 @@ const createPost = () => {
     console.log(error.graphQLErrors)
     form.value.loading = false
 
-    const key = Object.keys(
-      error.graphQLErrors[0].message
-    )[0]
+    Object.keys(error.graphQLErrors[0].message)[0]
     form.value.errors = error.graphQLErrors[0].message
   })
 }

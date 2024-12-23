@@ -26,6 +26,7 @@ const apolloClient = new ApolloClient({
 
 const apolloProvider = createApolloProvider({
   defaultClient: apolloClient,
+  
 })
 
 const app = createApp({
