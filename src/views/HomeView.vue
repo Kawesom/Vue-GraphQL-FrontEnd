@@ -1,11 +1,11 @@
 <script setup>
-import { useQuery } from '@vue/apollo-composable';
+import { useQuery, useResult } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { ApolloQuery } from '@vue/apollo-components';
 import { useRoute } from 'vue-router';
 
 
-const { result, loading } = useQuery(gql`
+const { result, loading: createPostLoading } = useQuery(gql`
       query getPosts($page: Int!) {
               posts(page: $page) {
                       data {
@@ -34,12 +34,28 @@ const { result, loading } = useQuery(gql`
             page: useRoute().query.page ? parseInt(useRoute().query.page) : 1
           })
 
+          //const posts = useResult(result, null, data => data.posts)
+
+          const { result: postResult } = useQuery(
+      gql`
+        query getPost($id: ID!) {
+          post(id: $id) {
+            title
+            body
+          }
+        }
+      `,
+      {
+        id: 1,
+      }
+    )
+
 </script>
 
 <template>
   <main>
     <div>
-      <div v-if="loading">Loading..............</div>
+      <div v-if="createPostLoading">Loading..............</div>
       <ul style="list-style-type: none; padding-left: 0;" v-if="result && result.posts">
         <li v-for="post in result.posts.data" :key="post.id">
           <RouterLink :to="{ name: 'post', params: {id: post.id}} ">
