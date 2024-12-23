@@ -2,24 +2,37 @@
 import { useQuery } from '@vue/apollo-composable';
 import gql from 'graphql-tag';
 import { ApolloQuery } from '@vue/apollo-components';
+import { useRoute } from 'vue-router';
 
 
 const { result, loading } = useQuery(gql`
-      query Posts {
-          posts {
-        data {
-            id
-            title
-            body
-            user {
-                id
-                name
-                email
-            }
+      query getPosts($page: Int!) {
+              posts(page: $page) {
+                      data {
+                          id
+                          title
+                          body
+                          user {
+                              id
+                              name
+                              email
+                          }
+                      }
+                      paginatorInfo {
+                            currentPage
+                            count
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
+                            total
+                        }
         }
-    }
 }
-          `)
+          `, {
+            page: useRoute().query.page ? parseInt(useRoute().query.page) : 1
+          })
 
 </script>
 
@@ -34,25 +47,57 @@ const { result, loading } = useQuery(gql`
           </RouterLink>
         </li>
       </ul>
+      <div v-if="result.posts">
+        <div>{{ result.posts.paginatorInfo.total }} total results</div>
+        <div>
+          Page {{ result.posts.paginatorInfo.currentPage }} of
+          {{ result.posts.paginatorInfo.lastPage }}
+        </div>
+        <div>
+          <router-link
+            :to="`/?page=${result.posts.paginatorInfo.currentPage - 1}`"
+            v-if="result.posts.paginatorInfo.currentPage != 1"
+            >Prev</router-link
+          >
+          &nbsp;
+          <router-link
+            :to="`/?page=${result.posts.paginatorInfo.currentPage + 1}`"
+            v-if="result.posts.paginatorInfo.hasMorePages"
+            >Next</router-link
+          >
+        </div>
+      </div>
     </div>
     <div>
       <h2>Apollo Query Component</h2>
       <ApolloQuery :query="gql => gql`
-      query Posts {
-          posts {
-        data {
-            id
-            title
-            body
-            user {
-                id
-                name
-                email
-            }
-        }
-    }
-}
-    `">
+                query Posts($page: Int!) {
+                    posts(page: $page) {
+                        data {
+                            id
+                            title
+                            body
+                            user {
+                                id
+                                name
+                                email
+                            }
+                        }
+                        paginatorInfo {
+                            currentPage
+                            count
+                            firstItem
+                            hasMorePages
+                            lastItem
+                            lastPage
+                            perPage
+                            total
+                        }
+
+              }
+          }
+    `"
+    :variables="{page: $route.query.page ? parseInt($route.query.page) : 1}">
         <template v-slot="{ result: { loading, error, data } }">
           <!-- Loading -->
           <div v-if="loading" class="loading apollo">Loading...</div>
