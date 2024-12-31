@@ -1,15 +1,36 @@
 <script setup>
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import { useMutation } from '@vue/apollo-composable'
+import { useMutation, useQuery } from '@vue/apollo-composable'
 import gql from 'graphql-tag'
+import { computed, ref } from 'vue'
 
 const router = useRouter()
+
+const me = ref({
+  is_admin: false,
+})
+
+const loggedIn = computed(() => {
+  return localStorage.getItem('apollo-token')
+})
+
+const { result } = useQuery(gql`
+     query MeRes {
+              me {
+                              id
+                              is_admin
+                            }
+                      }
+          `,
+        )
+
+//console.log(result.value.me.is_admin)
+me.value.is_admin = (result.value === undefined) ? "" : result.value.me.is_admin
 
 const LOGOUT_MUTATION = gql`
   mutation Logout{
     logout {
-        status
         message
     }
   }
@@ -42,7 +63,6 @@ const logout = () => {
   })
 }
 
-
 </script>
 
 <template>
@@ -54,13 +74,13 @@ const logout = () => {
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/me">Me</RouterLink>
+        <RouterLink v-if="loggedIn" to="/me">Me</RouterLink>
         <RouterLink to="/about">About</RouterLink>
-        <RouterLink to="/register">Register</RouterLink>
-        <RouterLink to="/admin">Admin</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/create">Create</RouterLink>
-        <a href="#" @click.prevent="logout">Logout</a>
+        <RouterLink v-if="!loggedIn" to="/register">Register</RouterLink>
+        <RouterLink v-if="loggedIn && me.is_admin" to="/admin">Admin</RouterLink>
+        <RouterLink v-if="!loggedIn" to="/login">Login</RouterLink>
+        <RouterLink v-if="loggedIn" to="/create">Create</RouterLink>
+        <a v-if="loggedIn" href="#" @click.prevent="logout">Logout</a>
       </nav>
     </div>
   </header>

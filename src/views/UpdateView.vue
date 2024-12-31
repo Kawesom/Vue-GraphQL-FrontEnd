@@ -41,11 +41,23 @@ import { useRoute, useRouter } from 'vue-router';
 import { ref } from 'vue';
 
 const form = ref({
+  id: "",
   title: "",//result.post.title,
   body: "",//result.post.body,
   loading: false,
   errors: null
 })
+
+
+
+const { result: res } = useQuery(gql`
+     query MeResult {
+              me {
+                              id
+                  }
+                      }
+          `,
+        )
 
 
 
@@ -55,14 +67,22 @@ const { result, loading } = useQuery(gql`
                               id
                               title
                               body
+                              user {
+                                id
+                              }
                             }
                       }
           `,{
           id: useRoute().params.id,
           }
         )
+//form.value.id =
 form.value.title = result.value.post.title
 form.value.body = result.value.post.body
+
+if (res.value.me.id != result.value.post.user.id) {
+  window.location.href = "/"
+}
 
 const router = useRouter()
 const route = useRoute()

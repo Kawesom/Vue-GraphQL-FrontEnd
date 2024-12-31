@@ -14,10 +14,12 @@
       </div>
     </div>
   </div>
-  <RouterLink :to="{ name: 'update', params: {id: $route.params.id}}">
+
+  <RouterLink v-if="res.me.id  == result.post.user.id" :to="{ name: 'update', params: {id: $route.params.id}}">
     Update
   </RouterLink>
-  <button @click="deletePost">Delete Post</button>
+
+  <button  v-if="res.me.id  == result.post.user.id" @click="deletePost">Delete Post</button>
   <div >
     <h2>Apollo Query Component</h2>
       <ApolloQuery :query="gql => gql`
@@ -69,12 +71,26 @@ import { ref } from 'vue';
 
 const error = ref(null)
 
+
+const { result: res } = useQuery(gql`
+     query MeResult {
+              me {
+                              id
+                  }
+                      }
+          `,
+        )
+
+
 const { result, loading } = useQuery(gql`
      query Post($id: ID!) {
               post(id: $id) {
                               id
                               title
                               body
+                              user {
+                                id
+                              }
                             }
                       }
           `,{
