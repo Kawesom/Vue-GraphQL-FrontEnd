@@ -57,6 +57,7 @@ const logout = () => {
         <RouterLink to="/me">Me</RouterLink>
         <RouterLink to="/about">About</RouterLink>
         <RouterLink to="/register">Register</RouterLink>
+        <RouterLink to="/admin">Admin</RouterLink>
         <RouterLink to="/login">Login</RouterLink>
         <RouterLink to="/create">Create</RouterLink>
         <a href="#" @click.prevent="logout">Logout</a>

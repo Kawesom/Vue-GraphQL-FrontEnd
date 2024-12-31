@@ -49,11 +49,10 @@ const router = useRouter()
 
 const CREATE_POST_MUTATION = gql`
   mutation createPost(
-    $user_id: ID!
     $title: String!
     $body: String!
   ) {
-    createPost(user_id: $user_id, title: $title, body: $body) {
+    createPost(title: $title, body: $body) {
       id
       title
       body
@@ -66,7 +65,6 @@ const { mutate, onDone, onError } = useMutation(CREATE_POST_MUTATION)
 const createPost = () => {
   form.value.loading = true
   mutate({
-    user_id: 10,
     title: form.value.title,
     body: form.value.body,
   })

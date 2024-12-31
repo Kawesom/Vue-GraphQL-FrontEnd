@@ -4,6 +4,7 @@
 
     <div>
       <div v-if="loading">Loading..............</div>
+      <div>{{ error }}</div>
       <div v-if="result && result.post">
         <h2>{{ result.post.title }}</h2>
         <div>{{ result.post.body }}</div>
@@ -66,6 +67,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { ApolloQuery } from '@vue/apollo-components';
 import { ref } from 'vue';
 
+const error = ref(null)
 
 const { result, loading } = useQuery(gql`
      query Post($id: ID!) {
@@ -81,6 +83,7 @@ const { result, loading } = useQuery(gql`
         )
 
 loading.value = ref(false)
+
 
 const router = useRouter()
 const route = useRoute()
@@ -115,7 +118,7 @@ const deletePost = () => {
     loading.value = false
 
     //Object.keys(error.graphQLErrors[0].message)[0]
-    //errors.value. = error.graphQLErrors[0].message
+    error.value = error.graphQLErrors[0].message
   })
 }
 
