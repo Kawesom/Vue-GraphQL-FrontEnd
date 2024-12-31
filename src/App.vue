@@ -1,6 +1,48 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
+import { useMutation } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
+
+const router = useRouter()
+
+const LOGOUT_MUTATION = gql`
+  mutation Logout{
+    logout {
+        status
+        message
+    }
+  }
+`
+
+const { mutate, onDone, onError } = useMutation(LOGOUT_MUTATION)
+
+const logout = () => {
+  //form.value.loading = true
+  mutate({
+    //email: form.value.email,
+    //password: form.value.password,
+  })
+
+  onDone((data) => {
+    console.log(data)
+    localStorage.removeItem('apollo-token')
+    //form.value.loading = false
+    //router.push({ name: 'home' })
+    window.location.href = '/'
+  })
+
+  onError((error) => {
+    //logErrorMessages(error)
+    console.log(error.graphQLErrors)
+    //form.value.loading = false
+
+    //Object.keys(error.graphQLErrors[0].message)[0]
+    //form.value.error = error.graphQLErrors[0].message
+  })
+}
+
+
 </script>
 
 <template>
@@ -12,8 +54,12 @@ import HelloWorld from './components/HelloWorld.vue'
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
+        <RouterLink to="/me">Me</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/register">Register</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
         <RouterLink to="/create">Create</RouterLink>
+        <a href="#" @click.prevent="logout">Logout</a>
       </nav>
     </div>
   </header>
